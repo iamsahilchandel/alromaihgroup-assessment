@@ -11,7 +11,7 @@
     "db:migrate": "bunx prisma migrate dev --skip-generate",
     "db:deploy": "bunx prisma migrate deploy"
   },
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@prisma/client": "6.19.0",
     "@prisma/extension-accelerate": "^2.0.2"
