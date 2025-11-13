@@ -2,15 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { ProductUpdateSchema } from "@repo/common";
 import { prisma } from "@repo/db";
 
-function getIdFromRequest(request: NextRequest) {
-  const url = new URL(request.url);
-  const segments = url.pathname.split("/").filter(Boolean);
-  return segments[segments.length - 1];
-}
-
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const id = getIdFromRequest(request);
+    const id = params.id;
     if (!id) return NextResponse.json({ error: "Missing product id" }, { status: 400 });
 
     const found = await prisma.product.findUnique({ where: { id } });
@@ -21,9 +18,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function PUT(request: NextRequest) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const id = getIdFromRequest(request);
+    const id = params.id;
     if (!id) return NextResponse.json({ error: "Missing product id" }, { status: 400 });
 
     const body = await request.json();
@@ -46,9 +46,12 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const id = getIdFromRequest(request);
+    const id = params.id;
     if (!id) return NextResponse.json({ error: "Missing product id" }, { status: 400 });
 
     try {
