@@ -44,7 +44,7 @@ model OrderItem {
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   
   productId String
-  productName String
+  product    Product  @relation(fields: [productId], references: [id])
   
   quantity  Int
   price     Float
@@ -53,6 +53,7 @@ model OrderItem {
   updatedAt DateTime @updatedAt
   
   @@index([orderId])
+  @@index([productId])
 }
 
 // Products available in the catalog
@@ -64,6 +65,8 @@ model Product {
   sku       String?  @unique
   inStock   Boolean  @default(true)
   metadata  Json?
+
+  orderItems OrderItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

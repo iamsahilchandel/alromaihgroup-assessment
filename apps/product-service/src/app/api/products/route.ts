@@ -33,13 +33,13 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const parsed = ProductCreateSchema.parse(body);
-    const created = await prisma.product.create({ data: parsed});
+    const parsed = ProductCreateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Validation failed", details: parsed.error.issues }, { status: 400 });
+    }
+    const created = await prisma.product.create({ data: parsed.data });
     return NextResponse.json(created, { status: 201 });
   } catch (err) {
-    if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: "Validation failed", details: err.issues }, { status: 400 });
-    }
     return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
   }
 }
@@ -47,11 +47,13 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const parsed = ProductUpdateSchema.parse(body);
-    const id = parsed.id ?? null;
+    const parsed = ProductUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Validation failed", details: parsed.error.issues }, { status: 400 });
+    }
+    const id = parsed.data.id ?? null;
     if (!id) return NextResponse.json({ error: "Missing product id" }, { status: 400 });
-
-    const data = { ...parsed };
+    const data = { ...parsed.data };
     delete data.id;
     try {
       const updated = await prisma.product.update({ where: { id }, data });

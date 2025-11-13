@@ -37,9 +37,12 @@ export async function PUT(request: NextRequest) {
     if (!id) return NextResponse.json({ error: "Missing product id" }, { status: 400 });
 
     const body = await request.json();
-    const parsed = ProductUpdateSchema.parse(body);
+    const parsed = ProductUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Validation failed", details: parsed.error.issues }, { status: 400 });
+    }
 
-    const data = { ...parsed };
+    const data = { ...parsed.data };
     delete data.id;
 
     try {

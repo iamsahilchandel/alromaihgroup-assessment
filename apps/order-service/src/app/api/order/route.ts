@@ -1,7 +1,6 @@
 import { prisma } from "@repo/db";
 import { NextResponse, NextRequest } from "next/server";
 import { CreateOrderSchema } from "@repo/common";
-import { ZodError } from "zod";
 
 // GET all orders with pagination
 export async function GET(request: NextRequest) {
@@ -60,7 +59,27 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate request body
-    const validatedData = CreateOrderSchema.parse(body);
+    const parsed = CreateOrderSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+    const validatedData = parsed.data;
+
+    // Resolve product data for each item (do not accept client-supplied name/price)
+    const itemsCreate = await Promise.all(
+      validatedData.items.map(async (it) => {
+        const product = await prisma.product.findUnique({ where: { id: it.productId } });
+        if (!product) throw new Error(`Product not found: ${it.productId}`);
+        return {
+          product: { connect: { id: product.id } },
+          quantity: it.quantity,
+          price: product.price,
+        };
+      })
+    );
 
     const order = await prisma.order.create({
       data: {
@@ -74,26 +93,18 @@ export async function POST(request: NextRequest) {
         billingAddress: validatedData.billingAddress,
         notes: validatedData.notes,
         items: {
-          create: validatedData.items,
+          create: itemsCreate,
         },
       },
       include: {
-        items: true,
+        items: {
+          include: { product: true },
+        },
       },
     });
 
     return NextResponse.json(order, { status: 201 });
   } catch (error) {
-    if (error instanceof ZodError) {
-      return NextResponse.json(
-        {
-          error: "Validation failed",
-          details: error.issues,
-        },
-        { status: 400 }
-      );
-    }
-
     if (error instanceof Error) {
       if (error.message.includes("Unique constraint failed")) {
         return NextResponse.json(

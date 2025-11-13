@@ -1,7 +1,6 @@
 import { prisma } from "@repo/db";
 import { NextResponse, NextRequest } from "next/server";
 import { UpdateOrderSchema } from "@repo/common";
-import { ZodError } from "zod";
 
 // GET a single order by ID
 export async function GET(
@@ -54,7 +53,14 @@ export async function PATCH(
     const body = await request.json();
 
     // Validate request body
-    const validatedData = UpdateOrderSchema.parse(body);
+    const parsed = UpdateOrderSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+    const validatedData = parsed.data;
 
     const updatedOrder = await prisma.order.update({
       where: { id: params.id },
@@ -66,16 +72,6 @@ export async function PATCH(
 
     return NextResponse.json(updatedOrder, { status: 200 });
   } catch (error) {
-    if (error instanceof ZodError) {
-      return NextResponse.json(
-        {
-          error: "Validation failed",
-          details: error.issues,
-        },
-        { status: 400 }
-      );
-    }
-
     console.error("PATCH /api/order/[id] error:", error);
     return NextResponse.json(
       { error: "Failed to update order" },
