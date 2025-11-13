@@ -9,7 +9,9 @@
   "scripts": {
     "db:generate": "bunx prisma generate",
     "db:migrate": "bunx prisma migrate dev --skip-generate",
-    "db:deploy": "bunx prisma migrate deploy"
+    "db:deploy": "bunx prisma migrate deploy",
+    "db:studio": "bunx prisma studio",
+    "db:format": "bunx prisma format"
   },
   "type": "module",
   "dependencies": {
