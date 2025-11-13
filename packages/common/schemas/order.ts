@@ -20,7 +20,15 @@ export const CreateOrderSchema = z.object({
 
 export const UpdateOrderSchema = z.object({
   status: z
-    .enum(["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"])
+    .enum([
+      "PENDING",
+      "CONFIRMED",
+      "PROCESSING",
+      "SHIPPED",
+      "DELIVERED",
+      "CANCELLED",
+      "REFUNDED",
+    ])
     .optional(),
   shippingAddress: z.string().optional(),
   billingAddress: z.string().optional(),

@@ -1,1 +1,2 @@
-export * from "./schemas";
+export * from "./schemas/order";
+export * from "./schemas/product";

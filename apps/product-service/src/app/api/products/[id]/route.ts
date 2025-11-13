@@ -1,16 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { ProductUpdateSchema } from "@repo/common";
 import { prisma } from "@repo/db";
-
-const ProductUpdateSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().min(1).optional(),
-  description: z.string().optional(),
-  price: z.number().nonnegative().optional(),
-  sku: z.string().optional(),
-  inStock: z.boolean().optional(),
-  metadata: z.record(z.string(), z.any()).optional(),
-});
 
 function getIdFromRequest(request: NextRequest) {
   const url = new URL(request.url);
@@ -51,10 +41,7 @@ export async function PUT(request: NextRequest) {
     } catch {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
-  } catch (err) {
-    if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: "Validation failed", details: err.issues }, { status: 400 });
-    }
+  } catch {
     return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
   }
 }
