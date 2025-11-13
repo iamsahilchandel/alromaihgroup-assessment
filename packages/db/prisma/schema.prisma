@@ -55,6 +55,22 @@ model OrderItem {
   @@index([orderId])
 }
 
+// Products available in the catalog
+model Product {
+  id        String   @id @default(cuid())
+  name      String
+  description String?
+  price     Float
+  sku       String?  @unique
+  inStock   Boolean  @default(true)
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sku])
+}
+
 enum OrderStatus {
   PENDING
   CONFIRMED
