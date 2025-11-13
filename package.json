@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "alromaihgroup-assessment",
   "private": true,
   "scripts": {
     "build": "turbo run build",
