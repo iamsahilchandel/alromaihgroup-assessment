@@ -1,0 +1,29 @@
+{
+  "name": "@repo/db",
+  "version": "1.0.0",
+  "author": "",
+  "main": "index.js",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "scripts": {
+    "db:generate": "bunx prisma generate",
+    "db:migrate": "bunx prisma migrate dev --skip-generate",
+    "db:deploy": "bunx prisma migrate deploy"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "6.19.0",
+    "@prisma/extension-accelerate": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "prisma": "6.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./client": "./client.ts"
+  }
+}
